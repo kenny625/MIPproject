@@ -9,6 +9,7 @@
         // get the canvas element and its context
         var canvas;
         var context;
+        var pathColor = "#000000";
         var tempPath = new Array();
         var storagePath;
         var xyPos = new Array();
@@ -24,6 +25,9 @@
                 touchstart: function(coors) {
                     context.beginPath();
                     context.moveTo(coors.x, coors.y);
+                    var selectColor = document.getElementById("selectColor");
+                    changeColor(selectColor.options[selectColor.selectedIndex].innerHTML);
+                    context.strokeStyle = pathColor;
                     this.isDrawing = true;
                     xyPos = new Array();
                     xyPos.push(-1);
@@ -113,6 +117,25 @@
             return pos;
         }
         
+        function changeColor(colorIn) {
+            switch (colorIn) {
+            case "black":
+                pathColor = "#000000";
+                break;
+            case "red":
+                pathColor = "#ff0000";
+                break;
+            case "green":
+                pathColor = "#00ff00";
+                break;
+            case "blue":
+                pathColor = "#0000ff";
+                break;
+            default:
+                pathColor = "#000000";
+            }
+        }
+        
 
         
     </script>
@@ -134,6 +157,12 @@
         <button onclick="savePath()">Save path</button>
         <button onclick="clearCanvas()">Clear</button>
         <button onclick="restorePath()">Restore path</button>
+        <select id="selectColor">
+			<option>black</option>
+			<option>red</option>
+			<option>green</option>
+			<option>blue</option>
+		</select>
     </div>
 </body>
 
