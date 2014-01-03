@@ -85,6 +85,7 @@
 		alert("restore");
 		var tempY, tempX, pos;
 		context.beginPath();
+		pos = getXY();        //the first will be -1
 		pos = getXY();
 		tempY = pos.y;
 		tempX = pos.x;
@@ -95,6 +96,9 @@
 		tempX = pos.x;
 /* 		console.log("x "+tempX+"y "+tempY); */
 		if(tempX == -1){
+			pos = getXY();
+		tempY = pos.y;
+		tempX = pos.x;
 			context.moveTo(tempX, tempY);
 			console.log("test");
 		}
