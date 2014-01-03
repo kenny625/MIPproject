@@ -1,0 +1,132 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+  <head> 
+    <meta charset="utf-8"> 
+	<meta name="viewport" content="width=768px, maximum-scale=1.0" /> 
+    <title>sketchpad</title> 
+	<script type="text/javascript" charset="utf-8"> 
+	// get the canvas element and its context
+		var canvas;
+		var context;
+	var tempPath = new Array();
+	var xyPos = new Array();
+	
+	window.addEventListener('load',function(){
+		// get the canvas element and its context
+			canvas = document.getElementById('sketchpad');
+			context = canvas.getContext('2d');
+		// create a drawer which tracks touch movements
+		var drawer = {
+			isDrawing: false,
+			touchstart: function(coors){
+				context.beginPath();
+				context.moveTo(coors.x, coors.y);
+				this.isDrawing = true;
+				console.log("start");
+				xyPos = new Array();
+				xyPos.push(-1);
+				xyPos.push(-1);
+				tempPath.push(xyPos);
+			},
+			touchmove: function(coors){
+				if (this.isDrawing) {
+			        context.lineTo(coors.x, coors.y);
+			        context.stroke();
+			        xyPos = new Array();
+				xyPos.push(coors.x);
+				xyPos.push(coors.y);
+				tempPath.push(xyPos);
+				}
+				console.log("move");
+			},
+			touchend: function(coors){
+			alert("end");
+				if (this.isDrawing) {
+			        this.touchmove(coors);
+			        this.isDrawing = false;
+				}
+				
+				console.log("test");
+			}
+		};
+		// create a function to pass touch events and coordinates to drawer
+		function draw(event){
+			// get the touch coordinates
+			var coors = {
+				x: event.targetTouches[0].pageX,
+				y: event.targetTouches[0].pageY
+			};
+			// pass the coordinates to the appropriate handler
+			drawer[event.type](coors);
+		}
+		
+		// attach the touchstart, touchmove, touchend event listeners.
+	    canvas.addEventListener('touchstart',draw, false);
+	    canvas.addEventListener('touchmove',draw, false);
+	    canvas.addEventListener('touchend',draw, false);
+		
+		// prevent elastic scrolling
+		document.body.addEventListener('touchmove',function(event){
+			event.preventDefault();
+		},false);	// end body.onTouchMove
+		
+	},false);	// end window.onLoad
+	
+	function savePath(){
+		alert("path");
+						console.log(tempPath);
+	}
+	
+	function clearCanvas(){
+		context.clearRect(0, 0, canvas.width, canvas.height);
+	}
+	
+	function restorePath(){
+		alert("restore");
+		var tempY, tempX, pos;
+		context.beginPath();
+		pos = getXY();
+		tempY = pos.y;
+		tempX = pos.x;
+		context.moveTo(tempX, tempY);
+		while(tempPath.length >0){
+			pos = getXY();
+		tempY = pos.y;
+		tempX = pos.x;
+/* 		console.log("x "+tempX+"y "+tempY); */
+		if(tempX == -1){
+			context.moveTo(tempX, tempY);
+			console.log("test");
+		}
+		context.lineTo(tempX+1, tempY+1);
+		context.stroke();
+		}
+	}
+	
+	function getXY(){
+		var tempXY;
+		tempXY = tempPath.pop();
+		var pos = new Object();
+		pos.y = tempXY.pop();
+		pos.x = tempXY.pop();
+		return pos;
+	}
+	</script> 
+    <style type="text/css"><!--
+		body{margin:0;padding:0; font-family:Arial;}
+		#container{position:relative;}
+		#sketchpad{ border: 1px solid #000;}		
+    --></style> 
+  </head> 
+  <body> 
+	<div id="container"> 
+<!-- 	766*944 -->
+      <canvas id="sketchpad" width="766" height="800"> 
+        Sorry, your browser is not supported.
+      </canvas>		
+      <button onclick="savePath()">Save path</button> 
+      <button onclick="clearCanvas()">Clear</button>
+      <button onclick="restorePath()">Restore path</button> 
+	</div> 
+  </body> 
+</html>
