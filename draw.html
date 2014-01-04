@@ -10,6 +10,7 @@
         var canvas;
         var context;
         var pathColor = "#000000";
+        var colorArray = new Array();
         var tempPath = new Array();
         var storagePath;
         var xyPos = new Array();
@@ -32,6 +33,7 @@
                     xyPos = new Array();
                     xyPos.push(-1);
                     xyPos.push(-1);
+					colorArray.push(pathColor);
                     tempPath.push(xyPos);
                 },
                 touchmove: function(coors) {
@@ -76,17 +78,19 @@
 
         function savePath() {
             alert("Path saved");
-            console.log(tempPath);
             localStorage[filename+'_'+slice] = JSON.stringify(tempPath);
+            localStorage[filename+'_'+slice+'_color'] = JSON.stringify(colorArray);
         }
 
         function clearCanvas() {
             context.clearRect(0, 0, canvas.width, canvas.height);
+            tempPath = new Array();
         }
 
         function restorePath() {
             var tempY, tempX, pos;
             storagePath = JSON.parse(localStorage[filename+'_'+slice]);
+            tempPath = JSON.parse(localStorage[filename+'_'+slice]);    //in order for the next save operation to save the previous drawing 
             context.beginPath();
             pos = getXY(); //the first will be -1
             pos = getXY();
