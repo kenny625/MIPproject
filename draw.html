@@ -13,6 +13,7 @@
         var colorArray = new Array();
         var tempPath = new Array();
         var storagePath;
+        var storageColor;
         var xyPos = new Array();
         var filename='test', slice=1;
 
@@ -85,27 +86,37 @@
         function clearCanvas() {
             context.clearRect(0, 0, canvas.width, canvas.height);
             tempPath = new Array();
+            colorArray = new Array();
         }
 
         function restorePath() {
-            var tempY, tempX, pos;
+            var tempY, tempX, pos, tempColor, colorSegmentIndex=0;
             storagePath = JSON.parse(localStorage[filename+'_'+slice]);
             tempPath = JSON.parse(localStorage[filename+'_'+slice]);    //in order for the next save operation to save the previous drawing 
+            storageColor = JSON.parse(localStorage[filename+'_'+slice+'_color']);
+            colorArray = JSON.parse(localStorage[filename+'_'+slice+'_color']);
             context.beginPath();
-            pos = getXY(); //the first will be -1
             pos = getXY();
             tempY = pos.y;
             tempX = pos.x;
             context.moveTo(tempX, tempY);
+            tempColor = storageColor.pop();
+            context.strokeStyle = tempColor;
             while (storagePath.length > 0) {
                 pos = getXY();
                 tempY = pos.y;
                 tempX = pos.x;
                 if (tempX == -1) {
+                	if(storagePath.length == 0){
+	                	break;
+                	}
                     pos = getXY();
                     tempY = pos.y;
                     tempX = pos.x;
+                    context.beginPath();
                     context.moveTo(tempX, tempY);
+                    tempColor = storageColor.pop();
+					context.strokeStyle = tempColor;
                 }
                 context.lineTo(tempX + 1, tempY + 1);
                 context.stroke();
