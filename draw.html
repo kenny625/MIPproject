@@ -16,6 +16,9 @@
         var storageColor;
         var xyPos = new Array();
         var filename='test', slice=1;
+        var shape = 'free';
+        var circleCenter = new Object();
+        var circleColorArray = new Array();
 
         window.addEventListener('load', function() {
             // get the canvas element and its context
@@ -25,26 +28,62 @@
             var drawer = {
                 isDrawing: false,
                 touchstart: function(coors) {
-                    context.beginPath();
-                    context.moveTo(coors.x, coors.y);
+                    
                     var selectColor = document.getElementById("selectColor");
                     changeColor(selectColor.options[selectColor.selectedIndex].innerHTML);
+                    var selectShape = document.getElementById("selectShape");
+                    shape = selectShape.options[selectShape.selectedIndex].innerHTML;
+                    
+                    if(shape == 'circle'){
+	                    circleCenter.x = coors.x;
+                    circleCenter.y = coors.y;
+                    circleColorArray.push(pathColor);
+                    }else{
+                    context.beginPath();
+	                    context.moveTo(coors.x, coors.y);
+	                    xyPos = new Array();
+                    xyPos.push(-1);
+                    xyPos.push(-1);
+                    tempPath.push(xyPos);
+                    colorArray.push(pathColor);
+                    }
+                    
+                    
                     context.strokeStyle = pathColor;
                     this.isDrawing = true;
-                    xyPos = new Array();
-                    xyPos.push(-1);
-                    xyPos.push(-1);
-					colorArray.push(pathColor);
-                    tempPath.push(xyPos);
+                    
+					
+                    
+                    
                 },
                 touchmove: function(coors) {
                     if (this.isDrawing) {
-                        context.lineTo(coors.x, coors.y);
-                        context.stroke();
-                        xyPos = new Array();
+                        
+                        
+                        if(shape == 'circle'){
+                        var currentPathColor = pathColor;
+                        savePath();
+	                        context.clearRect(0, 0, canvas.width, canvas.height);
+                        restorePath();
+                        pathColor = currentPathColor;
+                        context.beginPath();
+                        context.strokeStyle = pathColor;
+						context.arc(circleCenter.x, circleCenter.y, Math.pow(Math.pow(coors.x-circleCenter.x, 2)+Math.pow(coors.y-circleCenter.y, 2), 0.5), 0, 2*Math.PI);
+						
+						
+                        }else{
+	                        context.lineTo(coors.x, coors.y);
+	                        xyPos = new Array();
                         xyPos.push(coors.x);
                         xyPos.push(coors.y);
                         tempPath.push(xyPos);
+                        }
+						
+                        context.stroke();
+                        
+                        
+                        
+                        
                     }
                 },
                 touchend: function(coors) {
@@ -78,7 +117,7 @@
         }, false); // end window.onLoad
 
         function savePath() {
-            alert("Path saved");
+/*             alert("Path saved"); */
             localStorage[filename+'_'+slice] = JSON.stringify(tempPath);
             localStorage[filename+'_'+slice+'_color'] = JSON.stringify(colorArray);
         }
@@ -188,6 +227,10 @@
 			<option>green</option>
 			<option>blue</option>
 			<option>white</option>
+		</select>
+		<select id="selectShape">
+			<option>free</option>
+			<option>circle</option>
 		</select>
     </div>
 </body>
