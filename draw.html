@@ -146,6 +146,9 @@
             case "blue":
                 pathColor = "#0000ff";
                 break;
+            case "white":
+                pathColor = "#ffffff";
+                break;
             default:
                 pathColor = "#000000";
             }
@@ -160,11 +163,18 @@
         		#container{position:relative;}
         		#sketchpad{ border: 1px solid #000;}		
             -->
+            #image{
+	            position: absolute;
+	            left: 0;
+	            top: 0;
+	            z-index: -1;
+            }
     </style>
 </head>
 
 <body>
     <div id="container">
+    	<img src="../012.jpg" id="image"/>
         <!-- 	766*944 -->
         <canvas id="sketchpad" width="766" height="800">
             Sorry, your browser is not supported.
@@ -177,6 +187,7 @@
 			<option>red</option>
 			<option>green</option>
 			<option>blue</option>
+			<option>white</option>
 		</select>
     </div>
 </body>
