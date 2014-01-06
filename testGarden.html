@@ -32,6 +32,7 @@
 				  padding-bottom: 20px;
 				font-family: helvetica, arial, sans serif;
 				background-color: black;
+				z-index: 0;
 			}
 
 			.navbar {
@@ -55,6 +56,7 @@
 				margin-right: 20px;
 				margin-left: 10px;
 				margin-bottom: 3px;
+				
 			}
 			.btnForAdjust{
 				margin-top: 3px;
@@ -95,21 +97,23 @@
 	    <div class="container">
 	
 	      <!-- Static navbar -->
-	      <div class="navbar navbar-default" role="navigation">
+	      <div class="navbar navbar-default excludingContainer" role="navigation">
 	        <div class="navbar-header">
 
-				<a class="btn btn-lg btn-primary btnForLock" id="lockCanvasButton" href="#" role="button"><span class="glyphicon glyphicon-lock"></span>&nbsp;&nbsp;Lock the slice</a>  
-				<a class="btn btn-lg btn-success btnForLock" id="unlockCanvasButton" href="#" role="button"><span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;Unlock the slice</a>
+				<a class="btn btn-lg btn-primary btnForLock mainNavbarComponent" id="lockCanvasButton" href="#" role="button"><span class="glyphicon glyphicon-lock"></span>&nbsp;&nbsp;Lock the slice</a>  
+				<a class="btn btn-lg btn-success btnForLock mainNavbarComponent" id="unlockCanvasButton" href="#" role="button"><span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;Unlock the slice</a>
+				<a class="btn btn-lg btn-success btnForLock drawingComponent" id="endDrawingButton" href="#" role="button"><span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;End drawing</a>
+				<a class="btn btn-lg btn-default btnForLock drawingComponent" id="drawingSettingButton" href="#" role="button"><span class="glyphicon glyphicon-calendar"></span>&nbsp;&nbsp;Drawing settings</a>
 	        </div>
 	        
 	        <div class="navbar-collapse collapse">
 	        
-	          <ul class="nav navbar-nav">
+	          <ul class="nav navbar-nav mainNavbarComponent">
 <!-- 	            <li class="active"><a href="#"><span class="glyphicon glyphicon-eye-open"></span>Brightness</a></li> -->
 	            <li class="dropdown">
 	              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-pencil"></span>Draw<b class="caret"></b></a>
 	              <ul class="dropdown-menu">
-	                <li><a href="#"><span class="glyphicon glyphicon-chevron-right"></span>Region of interest</a></li>
+	                <li><a href="#" id="ROIButton"><span class="glyphicon glyphicon-chevron-right" ></span>Region of interest</a></li>
 	                <li><a href="#"><span class="glyphicon glyphicon-chevron-right"></span>Circle</a></li>
 	              </ul>
 	            </li>
@@ -128,7 +132,7 @@
 	            </li>
 <!-- 	            <li><a href="#"><span class="glyphicon glyphicon-fullscreen"></span>Zoom</a></li> -->
 	          </ul>
-	        <div class="navbar-header">
+	        <div class="navbar-header mainNavbar">
 
 					<a class="btn btn-lg btn-default btnForAdjust" id="propertyApplyAgainButton" href="#" role="button"><span class="glyphicon glyphicon-plus" ></span></a>
 
@@ -140,7 +144,7 @@
 	        </div>
 	          
 	          
-	          <ul class="nav navbar-nav navbar-right">
+	          <ul class="nav navbar-nav navbar-right mainNavbarComponent">
 	            <li class="dropdown">
 	              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-floppy-disk"></span>File<b class="caret"></b></a>
 	              <ul class="dropdown-menu" id="fileDropdown">
@@ -165,13 +169,19 @@
 			      <div class="modal-body">
 					<form role="form">
 					  <div class="form-group">
-					    <label for="exampleInputEmail1">Root file URL</label>
+					    <label for="exampleInputEmail1">Root file name</label>
 					    <input type="email" class="form-control" id="inputRootUrl" placeholder="ex. http://www.../example_">
 					  </div>
+					  
 					  <div class="form-group">
 					    <label for="exampleInputEmail1">File extension</label>
 					    <input type="email" class="form-control" id="inputFileExtension" placeholder="ex. jpg">
 					  </div>
+					  <div class="form-group">
+					    <label for="exampleInputEmail1">File upload</label>
+					    <input type="file" id="exampleInputFile">
+					  </div>
+					  
 					</form>
 
 			      </div>
@@ -197,6 +207,7 @@
 			</div><!-- /.modal -->
 
 
+
 			<!-- Modal -->
 			<div class="modal fade" id="loadingCompleteModal" tabindex="0" role="dialog" aria-hidden="true">
 			  <div class="modal-dialog">
@@ -212,6 +223,33 @@
 			</div><!-- /.modal -->
 
 	    </div> <!-- /container -->
+	    
+	
+<!-- draw的工具panel -->
+		<div class="modal fade" id="ROIDrawingPanelModal">
+		  <div class="modal-dialog">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		        <h4 class="modal-title">Region of Interest - Drawing Panel</h4>
+		      </div>
+		      <div class="modal-body">
+		        <h3>Color</h3>		        
+		        <button type="button" class="btn btn-default" id="selectBlackButton">Black</button>
+		        <button type="button" class="btn btn-default" id="selectRedButton">Red</button>
+		        <button type="button" class="btn btn-default" id="selectGreenButton">Green</button>
+		        <button type="button" class="btn btn-default" id="selectBlueButton">Blue</button>
+		        <button type="button" class="btn btn-default" id="selectWhiteButton">White</button>
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-primary" id="savePathButton">Save the path</button>
+				<button type="button" class="btn btn-danger" id="clearCanvasButton">Clear the canvas</button>
+				<button type="button" class="btn btn-warning" id="restorePathButton">Restore the path</button>
+		      </div>
+		    </div><!-- /.modal-content -->
+		  </div><!-- /.modal-dialog -->
+		</div><!-- /.modal -->
+
 	
 	
 	    <!-- Bootstrap core JavaScript
@@ -219,21 +257,10 @@
 	    <!-- Placed at the end of the document so the pages load faster -->
 	    <script src="./include/jquery-1.10.2.min.js"></script>
 	    <script src="./include/bootstrap.min.js"></script>
+
+		<div id="lineLayer">
+		</div>	    
 		<div id="canvasLayer">
-		</div>
-		<div id="content">
-		    <h1>Accelerometer Javascript Test</h1>
-			<ul>
-				<li>acceleration x: <span id="accelerationX"></span>  g</li>
-				<li>acceleration y: <span id="accelerationY"></span>  g</li>
-				<li>acceleration z: <span id="accelerationZ"></span>  g</li>
-				<li>rotation alpha: <span id="rotationAlpha"></span>  degree</li>
-				<li>rotation beta: <span id="rotationBeta"></span>  degree</li>
-				<li>rotation gamma: <span id="rotationGamma"></span>  degree</li>
-				<li>Level: <span id="levelDecision"></span>  level</li>
-			</ul>
-		
-			test: <span id="test"></span>
 		</div>
 
 <!-- 處理UI相關	 -->
@@ -251,20 +278,29 @@
 			});
 
 
-
 			var canvasLocked = false;
 			$('#unlockCanvasButton').hide();
 			
 			$( "#unlockCanvasButton" ).click(function(){
-				$('#unlockCanvasButton').hide();
-				$('#lockCanvasButton').show();
-				canvasLocked = false;
+				unlockCanvas();
 			});
+			function unlockCanvas(){
+				if(canvasLocked){
+					$('#unlockCanvasButton').hide();
+					$('#lockCanvasButton').show();
+					canvasLocked = false;
+				}
+			}
 			$( "#lockCanvasButton" ).click(function(){
-				$('#lockCanvasButton').hide();
-				$('#unlockCanvasButton').show();
-				canvasLocked = true;
+				lockCanvas();
 			});
+			function lockCanvas(){
+				if(!canvasLocked){
+					$('#lockCanvasButton').hide();
+					$('#unlockCanvasButton').show();
+					canvasLocked = true;
+				}
+			}			
 			
 			$("#propertyPlusButton").click(function(){
 				filterCurrentValue[currentFilterState] += filterNumberInterval[currentFilterState];
@@ -274,6 +310,12 @@
 				filterCurrentValue[currentFilterState] -= filterNumberInterval[currentFilterState];
 				imageUpdateWithFilter();
 			});
+
+			$('#endDrawingButton').hide();
+			$('#drawingSettingButton').hide();
+
+			
+
 			
 			
 			
@@ -341,9 +383,7 @@
 				setTimeout(function(){afterDelayCalled()},200);
 				
 				function afterDelayCalled(){
-					console.log("也不在意");
 					for(var i = 0; i<NUMBER_OF_LAYER; i++){
-		 				console.log("處理第"+i); 
 						var canvasFetched = document.getElementById("myCanvas"+(i+1));
 						var currentContext = canvasFetched.getContext('2d');
 						currentContext.drawImage(imageArray[i], 0, 0, canvasWidth, imageArray[i].height * screenImageratio);
@@ -387,6 +427,8 @@
 <!-- 		連線、存取資料相關 -->
 		<script>
 
+
+
 		   //javascript當參數傳進callback的時候，不用加變數那些得，只要名字就好
 			function jQuerySend(command, arg1){    
 				var message = {};
@@ -407,18 +449,17 @@
 					//不知道為什麼，.done()一直有問題
 					//直接function加在success也不行
 					//success用callback回去也不行					
-					var resultParsed = JSON.parse(result.responseText);
-					
 					switch (command){
 						case "QUERY_URL":
+							var resultParsed = JSON.parse(result.responseText);
 							addFileDropdownAtFirst(resultParsed);
+							break;
+						case "UPDATE_PATH":
 							break;
 						default:
 							break;
 					}
 /* 					console.log(resultParsed[0].url); */
-
-					
 				});
 
 
@@ -427,6 +468,45 @@
 			
 			var fileDropdownItems = Array();
 			var itemsCount = 0;
+			
+	        //如果想使用多層array的話，就要一層一層的用{}來宣告，不然會有undefined的錯誤
+	        var drawLineStorage	 = {};
+	        drawLineStorage['path'] = {};
+	        drawLineStorage['color'] = {};
+	        
+			function addFileDropdownAtFirst(resultParsed){
+				console.log("重複在開機、關機");
+				console.log(resultParsed);	
+				for(var key in resultParsed){
+					itemsCount = fileDropdownItems.length;
+					addLiIntoFileDropdown(resultParsed[key].url,resultParsed[key].fileExtension,itemsCount);
+					fileDropdownItems.push(resultParsed[key]);
+				}
+				for(var key in resultParsed){
+					var keyURL = resultParsed[key].url;
+		        	if(!drawLineStorage['path'][keyURL]){
+		        		drawLineStorage['path'][keyURL] = {};
+		        		drawLineStorage['color'][keyURL] = {};
+		        		console.log("創造array");
+		        		for (var i = 0; i <= 10 ; i++){
+			        		drawLineStorage['path'][keyURL][i] = {};
+			        		drawLineStorage['color'][keyURL][i] = {};
+		        		}
+			        }	        
+					var pathResult = JSON.parse(resultParsed[key].path);
+					var colorResult = JSON.parse(resultParsed[key].color);					
+					for (var i = 0; i <= 10; i++){
+			            drawLineStorage['path'][keyURL][i] = pathResult[i];
+			            drawLineStorage['color'][keyURL][i] = colorResult[i];
+					}
+					
+					console.log(key+"::complete");
+
+				}
+				console.log(drawLineStorage);
+			}
+			
+/*
 			function addFileDropdownAtFirst(resultParsed){
 				console.log("重複在開機、關機");
 				console.log(resultParsed);	
@@ -436,8 +516,8 @@
 					fileDropdownItems.push(resultParsed[key]);
 				}
 			}
+*/
 
-			
 			//查所有url
 			jQuerySend("QUERY_URL","");
 
@@ -451,6 +531,20 @@
 			var canvasWidth = document.documentElement.clientWidth;
 			var canvasHeight = document.documentElement.clientHeight;
 			
+			//加入sketchpad
+			var canvas = document.createElement('canvas');
+			canvas.id     = "sketchpad";
+			canvas.width  = canvasWidth;	
+			canvas.height = canvasHeight;		
+/* 			canvas.style.backgroundColor = "red"; */
+			//會讓他剛開始點不到
+			canvas.style.zIndex = "-1";
+/* 			canvas.style.display = "none"; */
+			canvas.style.position = "absolute";
+/* 			canvas.style.top = "-15px"; */
+
+			document.getElementById("canvasLayer").appendChild(canvas);		
+			
 			for(var i = 0; i<NUMBER_OF_LAYER; i++){
 				var canvas = document.createElement('canvas');
 				canvas.id     = "myCanvas"+(i+1);
@@ -462,7 +556,7 @@
 				document.getElementById("canvasLayer").appendChild(canvas);
 				
 			}
-						
+
 			function addLiIntoFileDropdown(inputRootUrl,inputFileExtension,itemNumber){
 				var liCreated = document.createElement('li');
 				liCreated.innerHTML = "<a href='#' id='dropdownItem_"+itemNumber+"'><img class='dropdownPicture' src='./imageFile/"+inputRootUrl+"/1."+inputFileExtension+"'>"+inputRootUrl+"</a>";
@@ -475,11 +569,8 @@
 
 			var loadedImageNumber = 0;
 			var imageArray = Array();
+			var rootSourceUrl;//現在這個變成uist, test那種
 			function reloadImage(itemNumber){
-/*
-				var rootSourceUrl = "http://www.csie.ntu.edu.tw/~r01922013/MIPFinal_UI/tiny_"
-				var rootSourceType = "jpg";			
-*/
 				console.log(fileDropdownItems);
 				rootSourceUrl = fileDropdownItems[itemNumber].url;
 				rootSourceType = fileDropdownItems[itemNumber].fileExtension;
@@ -504,10 +595,8 @@
 						currentContext.drawImage(imageArray[i], 0, 0, canvasWidth, imageArray[i].height * screenImageratio);
 /* 		 				applyFilter(currentContext,"CONTRAST",20);  */
 					}
-
-/* 					alert(imageArray[0].height); */
+					disableDrawing();
 					$('#loadingCompleteModal').modal('show');
-/* 					jQuerySend(); */
 				}
 			}
 			
@@ -662,7 +751,7 @@
 			}
 				
 		
-			
+			var currentSlice = -1;
 			if (window.DeviceMotionEvent != undefined) {
 				window.ondevicemotion = function(e) {
 					
@@ -673,10 +762,238 @@
 						for(var i = 0; i<10; i++){
 							document.getElementById("myCanvas"+(i+1)).style.display="none";
 						}
-						document.getElementById("myCanvas"+levelParse(e.accelerationIncludingGravity.y)).style.display="block";
-					}
+						currentSlice = levelParse(e.accelerationIncludingGravity.y);
+						document.getElementById("myCanvas" + currentSlice).style.display="block";
+						clearCanvas();
+	        			restorePath();
+	        		}
 				}
 			}
+		</script>
+		
+<!-- 		繪畫那段 -->
+<!-- UI部分 -->
+		<script>	
+			
+			$("#ROIButton").click(function(){
+				currentFilterState = FILTER_STATE_DRAW;
+				lockCanvas();
+				$('.mainNavbarComponent').hide();
+				$('.drawingComponent').show();
+				enableDrawing();
+			});
+
+			$("#drawingSettingButton").click(function(){
+				disableDrawing();
+				$('#ROIDrawingPanelModal').modal('show');
+			});
+			
+			$('#endDrawingButton').click(function(){
+				currentFilterState = FILTER_STATE_NORMAL;
+				savePath();
+				jQuerySend("UPDATE_PATH", drawLineStorage);
+				disableDrawing();
+				$('.mainNavbarComponent').show();
+				unlockCanvas();
+				$('.drawingComponent').hide();			
+			});
+			
+			function enableDrawing(){
+				$("#sketchpad").css("z-index", "1");
+				$(".excludingContainer").css("z-index", "0");
+				$(".canvasSeries").css("z-index", "-1");
+			}
+			function disableDrawing(){
+				$(".excludingContainer").css("z-index", "1");
+				$("#sketchpad").css("z-index", "0");
+				$(".canvasSeries").css("z-index", "-1");
+			}			
+			
+			$("#selectBlackButton").click(function(){
+				changeColor("black");
+			}); 			
+			$("#selectRedButton").click(function(){
+				changeColor("red");
+			});
+			$("#selectGreenButton").click(function(){
+				changeColor("green");
+			}); 			
+			$("#selectBlueButton").click(function(){
+				changeColor("blue");
+			}); 			
+			$("#selectWhiteButton").click(function(){
+				changeColor("white");
+			}); 			
+			$("#savePathButton").click(function(){
+				savePath();
+				$('#ROIDrawingPanelModal').modal('hide');
+			}); 			
+			$("#clearCanvasButton").click(function(){
+				clearCanvas();
+				$('#ROIDrawingPanelModal').modal('hide');
+			}); 	
+			$("#restorePathButton").click(function(){
+				restorePath();
+				$('#ROIDrawingPanelModal').modal('hide');
+			}); 			
+			
+			
+		</script>
+<!-- code部分 -->
+		<script>
+	        var sketchpadCanvas;
+	        var context;
+	        var pathColor = "#FFFFFF";
+	        var colorArray = new Array();
+	        var tempPath = new Array();
+	        var storagePath;
+	        var storageColor;
+	        var xyPos = new Array();
+	        
+	        var drawingEnabled = false;
+            var drawer;
+	        window.addEventListener('load', function() {
+	            // get the canvas element and its context
+	            canvas = document.getElementById('sketchpad');
+	            context = canvas.getContext('2d');
+	            // create a drawer which tracks touch movements
+	            drawer = {
+	                isDrawing: false,
+	                touchstart: function(coors) {
+	                	if(currentFilterState == FILTER_STATE_DRAW){
+		                    context.beginPath();
+		                    context.moveTo(coors.x, coors.y);
+		                    context.strokeStyle = pathColor;
+		                    this.isDrawing = true;
+		                    xyPos = new Array();
+		                    xyPos.push(-1);
+		                    xyPos.push(-1);
+							colorArray.push(pathColor);
+		                    tempPath.push(xyPos);
+	                    }
+	                },
+	                touchmove: function(coors) {
+	                    if (this.isDrawing && currentFilterState == FILTER_STATE_DRAW) {
+	                        context.lineTo(coors.x, coors.y);
+	                        context.stroke();
+	                        xyPos = new Array();
+	                        xyPos.push(coors.x);
+	                        xyPos.push(coors.y);
+	                        tempPath.push(xyPos);
+	                    }
+	                },
+	                touchend: function(coors) {
+	                    if (this.isDrawing && currentFilterState == FILTER_STATE_DRAW) {
+	                        this.touchmove(coors);
+	                        this.isDrawing = false;
+	                    }
+	                }
+	            };
+	            // create a function to pass touch events and coordinates to drawer
+	            function draw(event) {
+	                // get the touch coordinates
+	                var coors = {
+	                    x: event.targetTouches[0].pageX,
+	                    y: event.targetTouches[0].pageY-100
+	                };
+	                // pass the coordinates to the appropriate handler
+	                drawer[event.type](coors);
+	            }
+	
+	            // attach the touchstart, touchmove, touchend event listeners.
+	            canvas.addEventListener('touchstart', draw, false);
+	            canvas.addEventListener('touchmove', draw, false);
+	            canvas.addEventListener('touchend', draw, false);
+	
+	            // prevent elastic scrolling
+	            document.body.addEventListener('touchmove', function(event) {
+	                event.preventDefault();
+	            }, false); // end body.onTouchMove
+	
+	        }, false); // end window.onLoad
+	        
+
+	        //暫存檔
+	        function savePath() {
+
+	            alert("Path saved");
+	            drawLineStorage['path'][rootSourceUrl][currentSlice] = JSON.stringify(tempPath);
+	            drawLineStorage['color'][rootSourceUrl][currentSlice] = JSON.stringify(colorArray);
+	        }
+
+	        //暫清canvas
+	        function clearCanvas() {
+	            context.clearRect(0, 0, canvas.width, canvas.height);
+	            tempPath = new Array();
+	            colorArray = new Array();
+	        }
+	        //暫回path
+	        function restorePath() {
+	            var tempY, tempX, pos, tempColor, colorSegmentIndex=0;
+	            storagePath = JSON.parse(drawLineStorage['path'][rootSourceUrl][currentSlice]);
+	            tempPath = JSON.parse(drawLineStorage['path'][rootSourceUrl][currentSlice]);    //in order for the next save operation to save the previous drawing 
+	            storageColor = JSON.parse(drawLineStorage['color'][rootSourceUrl][currentSlice]);
+	            colorArray = JSON.parse(drawLineStorage['color'][rootSourceUrl][currentSlice]);
+	            context.beginPath();
+	            pos = getXY();
+	            tempY = pos.y;
+	            tempX = pos.x;
+	            context.moveTo(tempX, tempY);
+	            tempColor = storageColor.pop();
+	            context.strokeStyle = tempColor;
+	            while (storagePath.length > 0) {
+	                pos = getXY();
+	                tempY = pos.y;
+	                tempX = pos.x;
+	                if (tempX == -1) {
+	                	if(storagePath.length == 0){
+		                	break;
+	                	}
+	                    pos = getXY();
+	                    tempY = pos.y;
+	                    tempX = pos.x;
+	                    context.beginPath();
+	                    context.moveTo(tempX, tempY);
+	                    tempColor = storageColor.pop();
+						context.strokeStyle = tempColor;
+	                }
+	                context.lineTo(tempX + 1, tempY + 1);
+	                context.stroke();
+	            }
+	        }
+	
+	        function getXY() {
+	            var tempXY;
+	            tempXY = storagePath.pop();
+	            var pos = new Object();
+	            pos.y = tempXY.pop();
+	            pos.x = tempXY.pop();
+	            return pos;
+	        }
+	        
+	        function changeColor(colorIn) {
+	            switch (colorIn) {
+	            case "black":
+	                pathColor = "#000000";
+	                break;
+	            case "red":
+	                pathColor = "#ff0000";
+	                break;
+	            case "green":
+	                pathColor = "#00ff00";
+	                break;
+	            case "blue":
+	                pathColor = "#0000ff";
+	                break;
+	            case "white":
+	                pathColor = "#ffffff";
+	                break;
+	            default:
+	                pathColor = "#000000";
+	            }
+	        }
+
+
 		</script>
 
 	</body>

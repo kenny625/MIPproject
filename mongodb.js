@@ -1,7 +1,20 @@
 
 //require node modules (see package.json)
-var MongoClient = require('mongodb').MongoClient
-	, format = require('util').format;
+var MongoClient = require('mongodb').MongoClient,
+	format = require('util').format;
+	
+	Db = require('mongodb').Db,
+    Server = require('mongodb').Server,
+    ReplSetServers = require('mongodb').ReplSetServers,
+    ObjectID = require('mongodb').ObjectID,
+    Binary = require('mongodb').Binary,
+    GridStore = require('mongodb').GridStore,
+    Grid = require('mongodb').Grid,
+    Code = require('mongodb').Code,
+    BSON = require('mongodb').pure().BSON,
+    assert = require('assert');
+
+
 
 
 function queryUrl(res){
@@ -11,6 +24,15 @@ function queryUrl(res){
 				var collection = db.collection('jpgFile');
 				///數有幾筆
 
+/*
+			collection.insert([{'url': 'IM', 'fileExtension': 'jpg', 'path':'-1', 'color':'-1'}],{w:1}, function(docs) {});
+			collection.insert([{'url': 'uist', 'fileExtension': 'jpg', 'path':'-1', 'color':'-1'}],{w:1}, function(docs) {});
+			collection.insert([{'url': 'tiny', 'fileExtension': 'jpg', 'path':'-1', 'color':'-1'}],{w:1}, function(docs) {});
+			collection.insert([{'url': 'test', 'fileExtension': 'jpg', 'path':'-1', 'color':'-1'}],{w:1}, function(docs) {});
+*/
+
+	
+
 				collection.count(function(err, count) {
 					console.log("There are " + count + " records.");
 				var resultArray = new Array();
@@ -19,17 +41,19 @@ function queryUrl(res){
 					docs.forEach(function(doc) {
 						console.log("---------------------");
 /*
-						console.dir(doc);
+						console.dir(doc);	
 						console.log("FUCK!!!"+doc.url);
 */
 						var instance = {};
 						instance.url = doc.url;
 						instance.fileExtension = doc.fileExtension;
+						instance.path = doc.path;
+						instance.color = doc.color;
 						console.log(instance);
 						resultArray.push(instance);
 					});
-				console.log(resultArray);
-			    res.send(resultArray);
+					console.log(resultArray);
+					res.send(resultArray);
 				});
 
 					
@@ -59,13 +83,22 @@ app.post('/COMMAND',function(req, res){
 
     var responseData=req.body;
     console.log(responseData.command);
+    //用了body parser之後，連arg1裡面的東西都會parse成array，還蠻方變得
     console.log(responseData.arg1);
     switch (responseData.command){
 	    case "QUERY_URL":
-	        var queryResult = queryUrl(res);
+	        queryUrl(res);
+	        break;
+	    case "UPDATE_PATH":
+	    	update_path(responseData.arg1,res);
+			break;
 	    default:
 	    	break;
     }
+    
+});
+    
+
 
     // res.send(req.body);
 
@@ -80,10 +113,57 @@ app.post('/COMMAND',function(req, res){
     //用send傳回去
 */
 
+function update_path(responseDataInput,res){
+	console.log(responseDataInput);
+	MongoClient.connect('mongodb://MIPFinal:MIPFinal@ds061558.mongolab.com:61558/mip_final', function (err, db){
+			if (err) throw err;
+			console.log("Connected to Database");
+			
+			var collection = db.collection('jpgFile');
+			///數有幾筆
+			console.log("yo:::"+JSON.stringify(responseDataInput.path));				
+			
+			for(var key in responseDataInput.path){
+				console.log("key::"+key);
+				console.log("YO!!!"+JSON.stringify(responseDataInput['path'][key]));
+				collection.update({'url': key},{$set:{'path' : JSON.stringify(responseDataInput['path'][key])}},{upsert:true, w: 1}, function(err, numberUpdated) {
+					console.log("update number!+"+numberUpdated);
+		      });
+				collection.update({'url': key},{$set:{'color' : JSON.stringify(responseDataInput['color'][key])}},{upsert:true, w: 1}, function(err, numberUpdated) {
 
-});
+					console.log("update number!+"+numberUpdated);
+		      });
+			}
+			
+			collection.count(function(err, count) {
+				console.log("There are " + count + " records.");
+			});
+			
+			var resultArray = new Array();
+			
+			collection.find().toArray(function(err, docs) {
+				docs.forEach(function(doc) {
+/* 					console.log("---------------------"); */
+					var instance = {};
+					instance.url = doc.url;
+					instance.fileExtension = doc.fileExtension;
+					instance.path = doc.path;
+					instance.color = doc.color;
+					console.log(instance);
+					resultArray.push(instance);
+				});
+				console.log(resultArray);
+			    res.send("OK!");
+		    });	
+
+	});	
+}
+
+
 app.get('/', function (req, res) {
   res.sendfile(__dirname + '/testGarden.html');
 });
-
+app.get('/draw', function (req, res) {
+  res.sendfile(__dirname + '/draw.html');
+});
 app.use(express.static(__dirname));
