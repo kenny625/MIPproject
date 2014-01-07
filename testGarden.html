@@ -235,16 +235,16 @@
 		      </div>
 		      <div class="modal-body">
 		        <h3>Color</h3>		        
-		        <button type="button" class="btn btn-default" id="selectBlackButton">Black</button>
-		        <button type="button" class="btn btn-default" id="selectRedButton">Red</button>
-		        <button type="button" class="btn btn-default" id="selectGreenButton">Green</button>
-		        <button type="button" class="btn btn-default" id="selectBlueButton">Blue</button>
-		        <button type="button" class="btn btn-default" id="selectWhiteButton">White</button>
+		        <button type="button" class="btn btn-default drawingPanelButton" id="selectBlackButton">Black</button>
+		        <button type="button" class="btn btn-default drawingPanelButton" id="selectRedButton">Red</button>
+		        <button type="button" class="btn btn-default drawingPanelButton" id="selectGreenButton">Green</button>
+		        <button type="button" class="btn btn-default drawingPanelButton" id="selectBlueButton">Blue</button>
+		        <button type="button" class="btn btn-default drawingPanelButton" id="selectWhiteButton">White</button>
 		      </div>
 		      <div class="modal-footer">
-		        <button type="button" class="btn btn-primary" id="savePathButton">Save the path</button>
-				<button type="button" class="btn btn-danger" id="clearCanvasButton">Clear the canvas</button>
-				<button type="button" class="btn btn-warning" id="restorePathButton">Restore the path</button>
+		        <button type="button" class="btn btn-primary drawingPanelButton" id="savePathButton">Save the path</button>
+				<button type="button" class="btn btn-danger drawingPanelButton" id="clearCanvasButton">Clear the canvas</button>
+				<button type="button" class="btn btn-warning drawingPanelButton" id="restorePathButton">Restore the path</button>
 		      </div>
 		    </div><!-- /.modal-content -->
 		  </div><!-- /.modal-dialog -->
@@ -325,7 +325,8 @@
 			var FILTER_STATE_INVERT     = 5;
 			var FILTER_STATE_BLUR       = 6;
 			
-			var FILTER_STATE_DRAW       = 7;
+			var FILTER_STATE_DRAW_ROI    = 7;
+			var FILTER_STATE_DRAW_CIRCLE = 8;
 			
 			var filterNumberInterval = [0,30,5,10,0,0,0];
 			var filterCurrentValue   = [0,30,5,70,0,0,0];
@@ -471,6 +472,8 @@
 	        var drawLineStorage	 = {};
 	        drawLineStorage['path'] = {};
 	        drawLineStorage['color'] = {};
+	        drawLineStorage['circlePath'] = {};
+	        drawLineStorage['circleColor'] = {};
 	        
 			function addFileDropdownAtFirst(resultParsed){
 				console.log("重複在開機、關機");
@@ -485,10 +488,14 @@
 		        	if(!drawLineStorage['path'][keyURL]){
 		        		drawLineStorage['path'][keyURL] = {};
 		        		drawLineStorage['color'][keyURL] = {};
+		        		drawLineStorage['circlePath'][keyURL] = {};
+		        		drawLineStorage['circleColor'][keyURL] = {};
 		        		console.log("創造array");
 		        		for (var i = 0; i <= 10 ; i++){
 			        		drawLineStorage['path'][keyURL][i] = {};
 			        		drawLineStorage['color'][keyURL][i] = {};
+			        		drawLineStorage['circlePath'][keyURL][i] = {};
+			        		drawLineStorage['circleColor'][keyURL][i] = {};
 		        		}
 			        }	        
 					var pathResult = JSON.parse(resultParsed[key].path);
@@ -496,6 +503,8 @@
 					for (var i = 0; i <= 10; i++){
 			            drawLineStorage['path'][keyURL][i] = pathResult[i];
 			            drawLineStorage['color'][keyURL][i] = colorResult[i];
+			            drawLineStorage['circlePath'][keyURL][i] = colorResult[i];
+			            drawLineStorage['circleColor'][keyURL][i] = colorResult[i];
 					}
 					
 					console.log(key+"::complete");
@@ -774,7 +783,7 @@
 		<script>	
 			
 			$("#ROIButton").click(function(){
-				currentFilterState = FILTER_STATE_DRAW;
+				currentFilterState = FILTER_STATE_DRAW_ROI;
 				lockCanvas();
 				$('.mainNavbarComponent').hide();
 				$('.drawingComponent').show();
@@ -807,6 +816,58 @@
 				$(".canvasSeries").css("z-index", "-1");
 			}			
 			
+			$(".drawingPanelButton").click(function(){
+				switch(this.id){
+					case "selectBlackButton":
+						changeColor("black");
+						break;
+					case "selectRedButton":
+						changeColor("red");
+						break;
+					case "selectGreenButton":
+						changeColor("green");
+						break;
+					case "selectBlueButton":
+						changeColor("blue");
+						break;
+					case "selectWhiteButton":
+						changeColor("white");
+						break;
+					case "savePathButton":
+						savePath();
+						break;
+					case "clearCanvasButton":
+						clearCanvas();
+						break;
+					case "restorePathButton":
+						restorePath();
+						break;
+					default:
+						break;					
+				}
+				$('#ROIDrawingPanelModal').modal('hide');
+
+			}); 			
+			/*
+
+			
+			$("#savePathButton").click(function(){
+				savePath();
+				$('#ROIDrawingPanelModal').modal('hide');
+			}); 			
+			$("#clearCanvasButton").click(function(){
+				clearCanvas();
+				$('#ROIDrawingPanelModal').modal('hide');
+			}); 	
+			$("#restorePathButton").click(function(){
+				restorePath();
+
+			}); 		
+*/
+			
+			 /*
+
+			
 			$("#selectBlackButton").click(function(){
 				changeColor("black");
 			}); 			
@@ -822,25 +883,15 @@
 			$("#selectWhiteButton").click(function(){
 				changeColor("white");
 			}); 			
-			$("#savePathButton").click(function(){
-				savePath();
-				$('#ROIDrawingPanelModal').modal('hide');
-			}); 			
-			$("#clearCanvasButton").click(function(){
-				clearCanvas();
-				$('#ROIDrawingPanelModal').modal('hide');
-			}); 	
-			$("#restorePathButton").click(function(){
-				restorePath();
-				$('#ROIDrawingPanelModal').modal('hide');
-			}); 			
+*/
+	
 			
 			
 		</script>
 <!-- code部分 -->
 		<script>
 	        var sketchpadCanvas;
-	        var context;
+	        var sketchpadContext;
 	        var pathColor = "#FFFFFF";
 	        var colorArray = new Array();
 	        var tempPath = new Array();
@@ -852,16 +903,16 @@
             var drawer;
 	        window.addEventListener('load', function() {
 	            // get the canvas element and its context
-	            canvas = document.getElementById('sketchpad');
-	            context = canvas.getContext('2d');
+	            sketchpadCanvas = document.getElementById('sketchpad');
+	            sketchpadContext = sketchpadCanvas.getContext('2d');
 	            // create a drawer which tracks touch movements
 	            drawer = {
 	                isDrawing: false,
 	                touchstart: function(coors) {
-	                	if(currentFilterState == FILTER_STATE_DRAW){
-		                    context.beginPath();
-		                    context.moveTo(coors.x, coors.y);
-		                    context.strokeStyle = pathColor;
+	                	if(currentFilterState == FILTER_STATE_DRAW_ROI){
+		                    sketchpadContext.beginPath();
+		                    sketchpadContext.moveTo(coors.x, coors.y);
+		                    sketchpadContext.strokeStyle = pathColor;
 		                    this.isDrawing = true;
 		                    xyPos = new Array();
 		                    xyPos.push(-1);
@@ -871,9 +922,9 @@
 	                    }
 	                },
 	                touchmove: function(coors) {
-	                    if (this.isDrawing && currentFilterState == FILTER_STATE_DRAW) {
-	                        context.lineTo(coors.x, coors.y);
-	                        context.stroke();
+	                    if (this.isDrawing && currentFilterState == FILTER_STATE_DRAW_ROI) {
+	                        sketchpadContext.lineTo(coors.x, coors.y);
+	                        sketchpadContext.stroke();
 	                        xyPos = new Array();
 	                        xyPos.push(coors.x);
 	                        xyPos.push(coors.y);
@@ -881,7 +932,7 @@
 	                    }
 	                },
 	                touchend: function(coors) {
-	                    if (this.isDrawing && currentFilterState == FILTER_STATE_DRAW) {
+	                    if (this.isDrawing && currentFilterState == FILTER_STATE_DRAW_ROI) {
 	                        this.touchmove(coors);
 	                        this.isDrawing = false;
 	                    }
@@ -901,9 +952,9 @@
 	            }
 	
 	            // attach the touchstart, touchmove, touchend event listeners.
-	            canvas.addEventListener('touchstart', draw, false);
-	            canvas.addEventListener('touchmove', draw, false);
-	            canvas.addEventListener('touchend', draw, false);
+	            sketchpadCanvas.addEventListener('touchstart', draw, false);
+	            sketchpadCanvas.addEventListener('touchmove', draw, false);
+	            sketchpadCanvas.addEventListener('touchend', draw, false);
 	
 	            // prevent elastic scrolling
 	            document.body.addEventListener('touchmove', function(event) {
@@ -923,7 +974,7 @@
 
 	        //暫清canvas
 	        function clearCanvas() {
-	            context.clearRect(0, 0, canvas.width, canvas.height);
+	            sketchpadContext.clearRect(0, 0, sketchpadCanvas.width, sketchpadCanvas.height);
 	            tempPath = new Array();
 	            colorArray = new Array();
 	        }
@@ -935,13 +986,13 @@
 		            tempPath = JSON.parse(drawLineStorage['path'][rootSourceUrl][currentSlice]);    //in order for the next save operation to save the previous drawing 
 		            storageColor = JSON.parse(drawLineStorage['color'][rootSourceUrl][currentSlice]);
 		            colorArray = JSON.parse(drawLineStorage['color'][rootSourceUrl][currentSlice]);
-		            context.beginPath();
+		            sketchpadContext.beginPath();
 		            pos = getXY();
 		            tempY = pos.y;
 		            tempX = pos.x;
-		            context.moveTo(tempX, tempY);
+		            sketchpadContext.moveTo(tempX, tempY);
 		            tempColor = storageColor.pop();
-		            context.strokeStyle = tempColor;
+		            sketchpadContext.strokeStyle = tempColor;
 		            while (storagePath.length > 0) {
 		                pos = getXY();
 		                tempY = pos.y;
@@ -953,13 +1004,13 @@
 		                    pos = getXY();
 		                    tempY = pos.y;
 		                    tempX = pos.x;
-		                    context.beginPath();
-		                    context.moveTo(tempX, tempY);
+		                    sketchpadContext.beginPath();
+		                    sketchpadContext.moveTo(tempX, tempY);
 		                    tempColor = storageColor.pop();
-							context.strokeStyle = tempColor;
+							sketchpadContext.strokeStyle = tempColor;
 		                }
-		                context.lineTo(tempX + 1, tempY + 1);
-		                context.stroke();
+		                sketchpadContext.lineTo(tempX + 1, tempY + 1);
+		                sketchpadContext.stroke();
 		            }
 	        	}
 
