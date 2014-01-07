@@ -114,7 +114,7 @@
 	              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-pencil"></span>Draw<b class="caret"></b></a>
 	              <ul class="dropdown-menu">
 	                <li><a href="#" id="ROIButton"><span class="glyphicon glyphicon-chevron-right" ></span>Region of interest</a></li>
-	                <li><a href="#"><span class="glyphicon glyphicon-chevron-right"></span>Circle</a></li>
+	                <li><a href="#" id="CircleButton"><span class="glyphicon glyphicon-chevron-right"></span>Circle</a></li>
 	              </ul>
 	            </li>
 	            <li class="dropdown">
@@ -195,7 +195,7 @@
 			</div><!-- /.modal -->
 
 			<!-- Modal -->
-			<div class="modal fade" id="applyFilterModel" tabindex="-1" role="dialog" aria-hidden="true">
+			<div class="modal fade" id="applyFilterModel" tabindex="0" role="dialog" aria-hidden="true">
 			  <div class="modal-dialog">
 			    <div class="modal-content">
 			      <div class="modal-body">
@@ -379,7 +379,7 @@
 				//但delay如果太短也不行。這邊測試大概是200 ok。
 				//然後對於Anonymous function，可以照下面這樣寫來分離他。
 				$('#applyFilterModel').modal('show');
-				setTimeout(function(){afterDelayCalled()},200);
+				setTimeout(function(){afterDelayCalled()},400);
 				
 				function afterDelayCalled(){
 					for(var i = 0; i<NUMBER_OF_LAYER; i++){
@@ -500,11 +500,13 @@
 			        }	        
 					var pathResult = JSON.parse(resultParsed[key].path);
 					var colorResult = JSON.parse(resultParsed[key].color);					
+					var circlePathResult = JSON.parse(resultParsed[key].circlePath);					
+					var circleColorResult = JSON.parse(resultParsed[key].circleColor);					
 					for (var i = 0; i <= 10; i++){
 			            drawLineStorage['path'][keyURL][i] = pathResult[i];
 			            drawLineStorage['color'][keyURL][i] = colorResult[i];
-			            drawLineStorage['circlePath'][keyURL][i] = colorResult[i];
-			            drawLineStorage['circleColor'][keyURL][i] = colorResult[i];
+			            drawLineStorage['circlePath'][keyURL][i] = circlePathResult[i];
+			            drawLineStorage['circleColor'][keyURL][i] = circleColorResult[i];
 					}
 					
 					console.log(key+"::complete");
@@ -775,6 +777,15 @@
 				$('.drawingComponent').show();
 				enableDrawing();
 			});
+			
+			$("#CircleButton").click(function(){
+				currentFilterState = FILTER_STATE_DRAW_CIRCLE;
+				lockCanvas();
+				$('.mainNavbarComponent').hide();
+				$('.drawingComponent').show();
+				enableDrawing();
+			});			
+			
 
 			$("#drawingSettingButton").click(function(){
 				disableDrawing();
@@ -867,13 +878,14 @@
 	                	if(currentFilterState == FILTER_STATE_DRAW_ROI){
 		                    sketchpadContext.beginPath();
 		                    sketchpadContext.moveTo(coors.x, coors.y);
-		                    sketchpadContext.strokeStyle = pathColor;
-		                    this.isDrawing = true;
 		                    xyPos = new Array();
 		                    xyPos.push(-1);
 		                    xyPos.push(-1);
-							colorArray.push(pathColor);
 		                    tempPath.push(xyPos);
+							colorArray.push(pathColor);
+
+		                    sketchpadContext.strokeStyle = pathColor;
+		                    this.isDrawing = true;
 		                    
 	                    }else if(currentFilterState == FILTER_STATE_DRAW_CIRCLE){
 		                    circleCenter.x = coors.x;
@@ -883,7 +895,11 @@
 		                    circleXyPos.push(circleCenter.x);
 		                    circleXyPos.push(circleCenter.y);
 		                    circleTempPath.push(circleXyPos);
+		                    
+		                    sketchpadContext.strokeStyle = pathColor;
+		                    this.isDrawing = true;
 	                    }
+
 	                },
 	                touchmove: function(coors) {
 	                    if (this.isDrawing) {
@@ -951,7 +967,6 @@
 	        //暫存檔
 	        function savePath() {
 
-	            alert("Path saved");
 	            drawLineStorage['path'][rootSourceUrl][currentSlice] = JSON.stringify(tempPath);
 	            drawLineStorage['color'][rootSourceUrl][currentSlice] = JSON.stringify(colorArray);
 	            drawLineStorage['circlePath'][rootSourceUrl][currentSlice] = JSON.stringify(circleTempPath);
@@ -976,27 +991,25 @@
 		            storageColor = JSON.parse(drawLineStorage['color'][rootSourceUrl][currentSlice]);
 		            colorArray = JSON.parse(drawLineStorage['color'][rootSourceUrl][currentSlice]);
 		            
-		            circleStoragePath = JSON.parse(drawLineStorage['color'][rootSourceUrl][currentSlice]);
-		            circleTempPath = JSON.parse(drawLineStorage['color'][rootSourceUrl][currentSlice]);
-		            circleStorageColor = JSON.parse(drawLineStorage['circlePath'][rootSourceUrl][currentSlice]);
+		            circleStoragePath = JSON.parse(drawLineStorage['circlePath'][rootSourceUrl][currentSlice]);
+		            circleTempPath = JSON.parse(drawLineStorage['circlePath'][rootSourceUrl][currentSlice]);
+		            
+		            circleStorageColor = JSON.parse(drawLineStorage['circleColor'][rootSourceUrl][currentSlice]);
 		            circleColorArray = JSON.parse(drawLineStorage['circleColor'][rootSourceUrl][currentSlice]);
 		            
-/*
-		            if(circleStoragePath.length > 0){
-			            var circleStoragePathNum = circleStoragePath.length;
-			            for(i=0; i<circleStoragePathNum;i++){
-				            var circleTempPos = circleStoragePath.pop();
-				            var circleTempRadius = circleTempPos.pop();
-				            var circleTempY = circleTempPos.pop();
-				            var circleTempX = circleTempPos.pop();
-				            sketchpadContext.beginPath();
-				            tempCircleColor = circleStorageColor.pop();
-				            sketchpadContext.strokeStyle = tempCircleColor;
-				            sketchpadContext.arc(circleTempX, circleTempY, circleTempRadius, 0, 2*Math.PI);
-				            sketchpadContext.stroke();
-			            }
+		            console.log(drawLineStorage);
+		            var circleStoragePathNum = circleStoragePath.length;
+		            for(i=0; i<circleStoragePathNum;i++){
+			            var circleTempPos = circleStoragePath.pop();
+			            var circleTempRadius = circleTempPos.pop();
+			            var circleTempY = circleTempPos.pop();
+			            var circleTempX = circleTempPos.pop();
+			            sketchpadContext.beginPath();
+			            tempCircleColor = circleStorageColor.pop();
+			            sketchpadContext.strokeStyle = tempCircleColor;
+			            sketchpadContext.arc(circleTempX, circleTempY, circleTempRadius, 0, 2*Math.PI);
+			            sketchpadContext.stroke();
 		            }
-*/
 		            
 		            
 		            
