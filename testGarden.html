@@ -299,14 +299,16 @@
 					canvasLocked = true;
 				}
 			}			
-			
+			var INCREASE_PROPERTY = 1;
+			var DECREASE_PROPERTY = 2;
 			$("#propertyPlusButton").click(function(){
 				filterCurrentValue[currentFilterState] += filterNumberInterval[currentFilterState];
-				imageUpdateWithFilter();
+				imageUpdateWithFilter(INCREASE_PROPERTY);
 			});
 			$("#propertyMinusButton").click(function(){
 				filterCurrentValue[currentFilterState] -= filterNumberInterval[currentFilterState];
-				imageUpdateWithFilter();
+				//這邊改成傳進要做的改變量
+				imageUpdateWithFilter(DECREASE_PROPERTY);
 			});
 
 			$('#endDrawingButton').hide();
@@ -328,7 +330,7 @@
 			var FILTER_STATE_DRAW_ROI    = 7;
 			var FILTER_STATE_DRAW_CIRCLE = 8;
 			
-			var filterNumberInterval = [0,30,5,10,0,0,0];
+			var filterNumberInterval = [0,30,2,10,0,0,0];
 			var filterCurrentValue   = [0,30,5,70,0,0,0];
 
 			
@@ -371,36 +373,41 @@
 					default:
 						break;
 				}
-				imageUpdateWithFilter();
+				imageUpdateWithFilter(INCREASE_PROPERTY);
 			});
 			
-			function imageUpdateWithFilter(){
+			function imageUpdateWithFilter(alternationTypeInput){
 				//這邊如果沒有timeout，就會讓modal被卡在filter執行完之後才執行。感覺應該是UI讀取的問題
 				//但delay如果太短也不行。這邊測試大概是200 ok。
 				//然後對於Anonymous function，可以照下面這樣寫來分離他。
+				var alternationQuantity;
+				if (alternationTypeInput == INCREASE_PROPERTY){
+					alternationQuantity = filterCurrentValue[currentFilterState];
+				}else if (alternationTypeInput == DECREASE_PROPERTY){
+					alternationQuantity = 0 - filterCurrentValue[currentFilterState];					
+				}
 				$('#applyFilterModel').modal('show');
-				setTimeout(function(){afterDelayCalled()},400);
-				
+ 				setTimeout(function(){afterDelayCalled();},400); 
+/* 				afterDelayCalled(); */
 				function afterDelayCalled(){
 					for(var i = 0; i<NUMBER_OF_LAYER; i++){
 						var canvasFetched = document.getElementById("myCanvas"+(i+1));
 						var currentContext = canvasFetched.getContext('2d');
-						currentContext.drawImage(imageArray[i], 0, 0, canvasWidth, imageArray[i].height * screenImageratio);
 
 						var imageData = currentContext.getImageData(0,0, canvasWidth, canvasHeight); // ImageData
 
 						switch(currentFilterState){
 							case FILTER_STATE_BRIGHTNESS:
 								$("#numberInput").html(filterCurrentValue[currentFilterState]);
-								imageData.addBrightness(filterCurrentValue[currentFilterState]);	
+								imageData.addBrightness(alternationQuantity);	
 								break;
 							case FILTER_STATE_CONTRAST:
 								$("#numberInput").html(filterCurrentValue[currentFilterState]);
-								imageData.addContrast(filterCurrentValue[currentFilterState]);
+								imageData.addContrast(alternationQuantity);
 								break;
 							case FILTER_STATE_THRESHOLD:
 								$("#numberInput").html(filterCurrentValue[currentFilterState]);
-								imageData.threshold(filterCurrentValue[currentFilterState]);
+								imageData.threshold(alternationQuantity);
 								break;
 							case FILTER_STATE_SHARPEN:
 								imageData.convolution([ 0, -1, 0, -1, 5, -1, 0, -1, 0 ], 1, currentContext);
@@ -411,6 +418,10 @@
 							case FILTER_STATE_BLUR:
 								imageData.convolution([ 1/9, 1/9, 1/9, 1/9, 1/9, 1/9, 1/9, 1/9, 1/9 ], 1, currentContext);
 								break;
+							case FILTER_STATE_NORMAL:
+								currentContext.drawImage(imageArray[i], 0, 0, canvasWidth, imageArray[i].height * screenImageratio);
+								imageData = currentContext.getImageData(0,0, canvasWidth, canvasHeight); // ImageData
+								break;
 							default:
 								break;
 						}
@@ -418,8 +429,6 @@
 					}
 					$('#applyFilterModel').modal('hide');
 				}
-
-
 			}
 		</script>
 		
@@ -980,6 +989,7 @@
 	            sketchpadContext.clearRect(0, 0, sketchpadCanvas.width, sketchpadCanvas.height);
 	            tempPath = new Array();
 	            colorArray = new Array();
+	            circleTempPath = new Array();
 	        }
 	        //暫回path
 	        function restorePath() {

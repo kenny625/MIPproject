@@ -24,11 +24,14 @@ function queryUrl(res){
 				var collection = db.collection('jpgFile');
 				///數有幾筆
 
+			
 /*
-			collection.insert([{'url': 'IM', 'fileExtension': 'jpg', 'path':'-1', 'color':'-1', 'circlePath':'-1','circleColor':'-1'}],{w:1}, function(docs) {});
-			collection.insert([{'url': 'uist', 'fileExtension': 'jpg', 'path':'-1', 'color':'-1', 'circlePath':'-1','circleColor':'-1'}],{w:1}, function(docs) {});
-			collection.insert([{'url': 'tiny', 'fileExtension': 'jpg', 'path':'-1', 'color':'-1', 'circlePath':'-1','circleColor':'-1'}],{w:1}, function(docs) {});
-			collection.insert([{'url': 'test', 'fileExtension': 'jpg', 'path':'-1', 'color':'-1', 'circlePath':'-1','circleColor':'-1'}],{w:1}, function(docs) {});
+			collection.insert([{'url': 'AbdoVeineux_30mm_9', 'fileExtension': 'jpg', 'path':'-1', 'color':'-1', 'circlePath':'-1','circleColor':'-1'}],{w:1}, function(docs) {});
+			collection.insert([{'url': 'CT_WB_Natif_20mm_3', 'fileExtension': 'jpg', 'path':'-1', 'color':'-1', 'circlePath':'-1','circleColor':'-1'}],{w:1}, function(docs) {});
+			collection.insert([{'url': 'P31849_20130605', 'fileExtension': 'jpg', 'path':'-1', 'color':'-1', 'circlePath':'-1','circleColor':'-1'}],{w:1}, function(docs) {});
+			collection.insert([{'url': 'P41829_20130501', 'fileExtension': 'jpg', 'path':'-1', 'color':'-1', 'circlePath':'-1','circleColor':'-1'}],{w:1}, function(docs) {});
+			collection.insert([{'url': 'P44674_20130504', 'fileExtension': 'jpg', 'path':'-1', 'color':'-1', 'circlePath':'-1','circleColor':'-1'}],{w:1}, function(docs) {});
+			collection.insert([{'url': 'SS20130302', 'fileExtension': 'jpg', 'path':'-1', 'color':'-1', 'circlePath':'-1','circleColor':'-1'}],{w:1}, function(docs) {});
 */
 /*
 			collection.insert([{'url': 'IM', 'fileExtension': 'jpg', 'path':'{"0":{},"1":{},"2":{},"3":{},"4":{},"5":{},"6":{},"7":{},"8":{},"9":{},"10":"{}"}', 'color':'{"0":{},"1":{},"2":{},"3":{},"4":{},"5":{},"6":{},"7":{},"8":{},"9":{},"10":"{}"}', 'circlePath':'{"0":{},"1":{},"2":{},"3":{},"4":{},"5":{},"6":{},"7":{},"8":{},"9":{},"10":"{}"}','circleColor':'{"0":{},"1":{},"2":{},"3":{},"4":{},"5":{},"6":{},"7":{},"8":{},"9":{},"10":"{}"}'}],{w:1}, function(docs) {});
