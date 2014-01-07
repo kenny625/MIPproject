@@ -25,14 +25,19 @@ function queryUrl(res){
 				///數有幾筆
 
 /*
-			collection.insert([{'url': 'IM', 'fileExtension': 'jpg', 'path':'-1', 'color':'-1'}],{w:1}, function(docs) {});
-			collection.insert([{'url': 'uist', 'fileExtension': 'jpg', 'path':'-1', 'color':'-1'}],{w:1}, function(docs) {});
-			collection.insert([{'url': 'tiny', 'fileExtension': 'jpg', 'path':'-1', 'color':'-1'}],{w:1}, function(docs) {});
-			collection.insert([{'url': 'test', 'fileExtension': 'jpg', 'path':'-1', 'color':'-1'}],{w:1}, function(docs) {});
+			collection.insert([{'url': 'IM', 'fileExtension': 'jpg', 'path':'-1', 'color':'-1', 'circlePath':'-1','circleColor':'-1'}],{w:1}, function(docs) {});
+			collection.insert([{'url': 'uist', 'fileExtension': 'jpg', 'path':'-1', 'color':'-1', 'circlePath':'-1','circleColor':'-1'}],{w:1}, function(docs) {});
+			collection.insert([{'url': 'tiny', 'fileExtension': 'jpg', 'path':'-1', 'color':'-1', 'circlePath':'-1','circleColor':'-1'}],{w:1}, function(docs) {});
+			collection.insert([{'url': 'test', 'fileExtension': 'jpg', 'path':'-1', 'color':'-1', 'circlePath':'-1','circleColor':'-1'}],{w:1}, function(docs) {});
 */
-
+/*
+			collection.insert([{'url': 'IM', 'fileExtension': 'jpg', 'path':'{"0":{},"1":{},"2":{},"3":{},"4":{},"5":{},"6":{},"7":{},"8":{},"9":{},"10":"{}"}', 'color':'{"0":{},"1":{},"2":{},"3":{},"4":{},"5":{},"6":{},"7":{},"8":{},"9":{},"10":"{}"}', 'circlePath':'{"0":{},"1":{},"2":{},"3":{},"4":{},"5":{},"6":{},"7":{},"8":{},"9":{},"10":"{}"}','circleColor':'{"0":{},"1":{},"2":{},"3":{},"4":{},"5":{},"6":{},"7":{},"8":{},"9":{},"10":"{}"}'}],{w:1}, function(docs) {});
+			collection.insert([{'url': 'uist', 'fileExtension': 'jpg', 'path':'{"0":{},"1":{},"2":{},"3":{},"4":{},"5":{},"6":{},"7":{},"8":{},"9":{},"10":"{}"}', 'color':'{"0":{},"1":{},"2":{},"3":{},"4":{},"5":{},"6":{},"7":{},"8":{},"9":{},"10":"{}"}', 'circlePath':'{"0":{},"1":{},"2":{},"3":{},"4":{},"5":{},"6":{},"7":{},"8":{},"9":{},"10":"{}"}','circleColor':'{"0":{},"1":{},"2":{},"3":{},"4":{},"5":{},"6":{},"7":{},"8":{},"9":{},"10":"{}"}'}],{w:1}, function(docs) {});
+			collection.insert([{'url': 'tiny', 'fileExtension': 'jpg', 'path':'{"0":{},"1":{},"2":{},"3":{},"4":{},"5":{},"6":{},"7":{},"8":{},"9":{},"10":"{}"}', 'color':'{"0":{},"1":{},"2":{},"3":{},"4":{},"5":{},"6":{},"7":{},"8":{},"9":{},"10":"{}"}', 'circlePath':'{"0":{},"1":{},"2":{},"3":{},"4":{},"5":{},"6":{},"7":{},"8":{},"9":{},"10":"{}"}','circleColor':'{"0":{},"1":{},"2":{},"3":{},"4":{},"5":{},"6":{},"7":{},"8":{},"9":{},"10":"{}"}'}],{w:1}, function(docs) {});
+			collection.insert([{'url': 'test', 'fileExtension': 'jpg', 'path':'{"0":{},"1":{},"2":{},"3":{},"4":{},"5":{},"6":{},"7":{},"8":{},"9":{},"10":"{}"}', 'color':'{"0":{},"1":{},"2":{},"3":{},"4":{},"5":{},"6":{},"7":{},"8":{},"9":{},"10":"{}"}', 'circlePath':'{"0":{},"1":{},"2":{},"3":{},"4":{},"5":{},"6":{},"7":{},"8":{},"9":{},"10":"{}"}','circleColor':'{"0":{},"1":{},"2":{},"3":{},"4":{},"5":{},"6":{},"7":{},"8":{},"9":{},"10":"{}"}'}],{w:1}, function(docs) {});
 	
-
+*/
+/* '{"0":{},"1":{},"2":{},"3":{},"4":{},"5":{},"6":{},"7":{},"8":{},"9":{},"10":"{}"}' */
 				collection.count(function(err, count) {
 					console.log("There are " + count + " records.");
 				var resultArray = new Array();
@@ -49,7 +54,9 @@ function queryUrl(res){
 						instance.fileExtension = doc.fileExtension;
 						instance.path = doc.path;
 						instance.color = doc.color;
-						console.log(instance);
+						instance.circlePath = doc.circlePath;
+						instance.circleColor = doc.circleColor;
+/* 						console.log(instance); */
 						resultArray.push(instance);
 					});
 					console.log(resultArray);
@@ -126,14 +133,22 @@ function update_path(responseDataInput,res){
 			for(var key in responseDataInput.path){
 				console.log("key::"+key);
 				console.log("YO!!!"+JSON.stringify(responseDataInput['path'][key]));
+				
 				collection.update({'url': key},{$set:{'path' : JSON.stringify(responseDataInput['path'][key])}},{upsert:true, w: 1}, function(err, numberUpdated) {
-					console.log("update number!+"+numberUpdated);
+					console.log("PATH update number!+"+numberUpdated);
 		      });
 				collection.update({'url': key},{$set:{'color' : JSON.stringify(responseDataInput['color'][key])}},{upsert:true, w: 1}, function(err, numberUpdated) {
-
-					console.log("update number!+"+numberUpdated);
+					console.log("COLOR update number!+"+numberUpdated);
+		      });
+				collection.update({'url': key},{$set:{'circlePath' : JSON.stringify(responseDataInput['circlePath'][key])}},{upsert:true, w: 1}, function(err, numberUpdated) {
+					console.log("CIRCLEPATH update number!+"+numberUpdated);
+		      });
+				collection.update({'url': key},{$set:{'circleColor' : JSON.stringify(responseDataInput['circleColor'][key])}},{upsert:true, w: 1}, function(err, numberUpdated) {
+					console.log("CIRCLECOLOR update number!+"+numberUpdated);
 		      });
 			}
+
+
 			
 			collection.count(function(err, count) {
 				console.log("There are " + count + " records.");
@@ -149,6 +164,9 @@ function update_path(responseDataInput,res){
 					instance.fileExtension = doc.fileExtension;
 					instance.path = doc.path;
 					instance.color = doc.color;
+					instance.circlePath = doc.circlePath;
+					instance.circleColor = doc.circleColor;
+
 					console.log(instance);
 					resultArray.push(instance);
 				});
