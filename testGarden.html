@@ -980,19 +980,23 @@
 		            circleTempPath = JSON.parse(drawLineStorage['color'][rootSourceUrl][currentSlice]);
 		            circleStorageColor = JSON.parse(drawLineStorage['circlePath'][rootSourceUrl][currentSlice]);
 		            circleColorArray = JSON.parse(drawLineStorage['circleColor'][rootSourceUrl][currentSlice]);
-            
-		            var circleStoragePathNum = circleStoragePath.length;
-		            for(i=0; i<circleStoragePathNum;i++){
-			            var circleTempPos = circleStoragePath.pop();
-			            var circleTempRadius = circleTempPos.pop();
-			            var circleTempY = circleTempPos.pop();
-			            var circleTempX = circleTempPos.pop();
-			            sketchpadContext.beginPath();
-			            tempCircleColor = circleStorageColor.pop();
-			            sketchpadContext.strokeStyle = tempCircleColor;
-			            sketchpadContext.arc(circleTempX, circleTempY, circleTempRadius, 0, 2*Math.PI);
-			            sketchpadContext.stroke();
+		            
+/*
+		            if(circleStoragePath.length > 0){
+			            var circleStoragePathNum = circleStoragePath.length;
+			            for(i=0; i<circleStoragePathNum;i++){
+				            var circleTempPos = circleStoragePath.pop();
+				            var circleTempRadius = circleTempPos.pop();
+				            var circleTempY = circleTempPos.pop();
+				            var circleTempX = circleTempPos.pop();
+				            sketchpadContext.beginPath();
+				            tempCircleColor = circleStorageColor.pop();
+				            sketchpadContext.strokeStyle = tempCircleColor;
+				            sketchpadContext.arc(circleTempX, circleTempY, circleTempRadius, 0, 2*Math.PI);
+				            sketchpadContext.stroke();
+			            }
 		            }
+*/
 		            
 		            
 		            
