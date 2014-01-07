@@ -513,23 +513,9 @@
 				console.log(drawLineStorage);
 			}
 			
-/*
-			function addFileDropdownAtFirst(resultParsed){
-				console.log("重複在開機、關機");
-				console.log(resultParsed);	
-				for(var key in resultParsed){
-					itemsCount = fileDropdownItems.length;
-					addLiIntoFileDropdown(resultParsed[key].url,resultParsed[key].fileExtension,itemsCount);
-					fileDropdownItems.push(resultParsed[key]);
-				}
-			}
-*/
-
 			//查所有url
 			jQuerySend("QUERY_URL","");
 
-		
-		
 		</script>
 
 <!-- 		以下是處理image相關 -->
@@ -847,44 +833,7 @@
 				}
 				$('#ROIDrawingPanelModal').modal('hide');
 
-			}); 			
-			/*
-
-			
-			$("#savePathButton").click(function(){
-				savePath();
-				$('#ROIDrawingPanelModal').modal('hide');
-			}); 			
-			$("#clearCanvasButton").click(function(){
-				clearCanvas();
-				$('#ROIDrawingPanelModal').modal('hide');
-			}); 	
-			$("#restorePathButton").click(function(){
-				restorePath();
-
-			}); 		
-*/
-			
-			 /*
-
-			
-			$("#selectBlackButton").click(function(){
-				changeColor("black");
-			}); 			
-			$("#selectRedButton").click(function(){
-				changeColor("red");
-			});
-			$("#selectGreenButton").click(function(){
-				changeColor("green");
-			}); 			
-			$("#selectBlueButton").click(function(){
-				changeColor("blue");
-			}); 			
-			$("#selectWhiteButton").click(function(){
-				changeColor("white");
-			}); 			
-*/
-	
+			}); 				
 			
 			
 		</script>
@@ -899,7 +848,13 @@
 	        var storageColor;
 	        var xyPos = new Array();
 	        
-	        var drawingEnabled = false;
+	        var circleCenter = new Object();
+	        var circleColorArray = new Array();
+	        var circleStorageColor;
+	        var circleTempPath = new Array();
+	        var circleXyPos = new Array();
+	        var circleStoragePath;
+	        
             var drawer;
 	        window.addEventListener('load', function() {
 	            // get the canvas element and its context
@@ -919,20 +874,49 @@
 		                    xyPos.push(-1);
 							colorArray.push(pathColor);
 		                    tempPath.push(xyPos);
+		                    
+	                    }else if(currentFilterState == FILTER_STATE_DRAW_CIRCLE){
+		                    circleCenter.x = coors.x;
+		                    circleCenter.y = coors.y;
+		                    circleColorArray.push(pathColor);
+		                    circleXyPos = new Array();
+		                    circleXyPos.push(circleCenter.x);
+		                    circleXyPos.push(circleCenter.y);
+		                    circleTempPath.push(circleXyPos);
 	                    }
 	                },
 	                touchmove: function(coors) {
-	                    if (this.isDrawing && currentFilterState == FILTER_STATE_DRAW_ROI) {
-	                        sketchpadContext.lineTo(coors.x, coors.y);
+	                    if (this.isDrawing) {
+	                    	if(currentFilterState == FILTER_STATE_DRAW_ROI){
+		                        sketchpadContext.lineTo(coors.x, coors.y);
+		                        xyPos = new Array();
+		                        xyPos.push(coors.x);
+		                        xyPos.push(coors.y);
+		                        tempPath.push(xyPos);		                    	
+	                    	}else if(currentFilterState == FILTER_STATE_DRAW_CIRCLE){
+		                        var currentPathColor = pathColor;
+		                        savePath();
+		                        sketchpadContext.clearRect(0, 0, sketchpadCanvas.width, sketchpadCanvas.height);
+		                        restorePath();
+		                        pathColor = currentPathColor;
+		                        sketchpadContext.beginPath();
+		                        sketchpadContext.strokeStyle = pathColor;
+		                        var radius = Math.pow(Math.pow(coors.x-circleCenter.x, 2)+Math.pow(coors.y-circleCenter.y, 2), 0.5);
+								sketchpadContext.arc(circleCenter.x, circleCenter.y, radius, 0, 2*Math.PI);
+								var tempCirclePos = circleTempPath.pop();
+									
+								if(tempCirclePos.length != 2){
+									tempCirclePos.pop();
+								}
+								tempCirclePos.push(radius);
+								circleTempPath.push(tempCirclePos);
+
+	                    	}
 	                        sketchpadContext.stroke();
-	                        xyPos = new Array();
-	                        xyPos.push(coors.x);
-	                        xyPos.push(coors.y);
-	                        tempPath.push(xyPos);
 	                    }
 	                },
 	                touchend: function(coors) {
-	                    if (this.isDrawing && currentFilterState == FILTER_STATE_DRAW_ROI) {
+	                    if (this.isDrawing && (currentFilterState == FILTER_STATE_DRAW_ROI || currentFilterState == FILTER_STATE_DRAW_CIRCLE)) {
 	                        this.touchmove(coors);
 	                        this.isDrawing = false;
 	                    }
@@ -970,6 +954,10 @@
 	            alert("Path saved");
 	            drawLineStorage['path'][rootSourceUrl][currentSlice] = JSON.stringify(tempPath);
 	            drawLineStorage['color'][rootSourceUrl][currentSlice] = JSON.stringify(colorArray);
+	            drawLineStorage['circlePath'][rootSourceUrl][currentSlice] = JSON.stringify(circleTempPath);
+	            drawLineStorage['circleColor'][rootSourceUrl][currentSlice] = JSON.stringify(circleColorArray);
+	            
+ 
 	        }
 
 	        //暫清canvas
@@ -982,14 +970,40 @@
 	        function restorePath() {
 	        	if(rootSourceUrl && drawLineStorage['path'][rootSourceUrl][currentSlice] ){
 		            var tempY, tempX, pos, tempColor, colorSegmentIndex=0;
+		            
 		            storagePath = JSON.parse(drawLineStorage['path'][rootSourceUrl][currentSlice]);
 		            tempPath = JSON.parse(drawLineStorage['path'][rootSourceUrl][currentSlice]);    //in order for the next save operation to save the previous drawing 
 		            storageColor = JSON.parse(drawLineStorage['color'][rootSourceUrl][currentSlice]);
 		            colorArray = JSON.parse(drawLineStorage['color'][rootSourceUrl][currentSlice]);
+		            
+		            circleStoragePath = JSON.parse(drawLineStorage['color'][rootSourceUrl][currentSlice]);
+		            circleTempPath = JSON.parse(drawLineStorage['color'][rootSourceUrl][currentSlice]);
+		            circleStorageColor = JSON.parse(drawLineStorage['circlePath'][rootSourceUrl][currentSlice]);
+		            circleColorArray = JSON.parse(drawLineStorage['circleColor'][rootSourceUrl][currentSlice]);
+            
+		            var circleStoragePathNum = circleStoragePath.length;
+		            for(i=0; i<circleStoragePathNum;i++){
+			            var circleTempPos = circleStoragePath.pop();
+			            var circleTempRadius = circleTempPos.pop();
+			            var circleTempY = circleTempPos.pop();
+			            var circleTempX = circleTempPos.pop();
+			            sketchpadContext.beginPath();
+			            tempCircleColor = circleStorageColor.pop();
+			            sketchpadContext.strokeStyle = tempCircleColor;
+			            sketchpadContext.arc(circleTempX, circleTempY, circleTempRadius, 0, 2*Math.PI);
+			            sketchpadContext.stroke();
+		            }
+		            
+		            
+		            
+		            
 		            sketchpadContext.beginPath();
-		            pos = getXY();
-		            tempY = pos.y;
-		            tempX = pos.x;
+		            if(storagePath.length > 0){
+			            pos = getXY();
+			            tempY = pos.y;
+			            tempX = pos.x;
+		            }
+		            
 		            sketchpadContext.moveTo(tempX, tempY);
 		            tempColor = storageColor.pop();
 		            sketchpadContext.strokeStyle = tempColor;
